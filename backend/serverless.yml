@@ -25,8 +25,8 @@ provider:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: handler.encrypt
     events:
       - http:
-          path: hello
-          method: get
+          path: encrypt
+          method: post
