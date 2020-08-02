@@ -2,11 +2,14 @@ import fs from "fs";
 import { parse } from "aws-lambda-multipart-parser";
 
 export const encrypt = async (event, context) => {
-  const writeStream = fs.createWriteStream("/tmp/experiment");
+  const writeStream = fs.createWriteStream("/tmp/originalData");
   //console.log(event);
-  const result = parse(event, false);
-  console.log(result);
-  result.file.content.pipe(writeStream);
+  const result = parse(event, true);
+  //console.log(result.file);
+  //result.file.content.pipe(writeStream);
+  writeStream.write(result.file.content, () => {
+    console.log("uploaded");
+  });
   return {
     statusCode: 200,
     body: JSON.stringify({
