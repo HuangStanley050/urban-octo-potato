@@ -4,8 +4,8 @@ import { parse } from "aws-lambda-multipart-parser";
 
 export const encrypt = async (event, context) => {
   const result = parse(event, true);
-  algorithm = "aes-256-ctr";
-  password = "d6F3Efeq";
+  const algorithm = "aes-256-ctr";
+  const password = "d6F3Efeq";
   //console.log(result);
   const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
   writeStream.write(result.file.content);
@@ -15,8 +15,8 @@ export const encrypt = async (event, context) => {
   writeStream.end();
 
   const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
-  encrypt = crypto.createCipher(algorithm, password);
-  encryptWriteStream = fs.createWriteStream(
+  const encrypt = crypto.createCipher(algorithm, password);
+  const encryptWriteStream = fs.createWriteStream(
     `/tmp/${result.file.filename}.encrypt`
   );
 
