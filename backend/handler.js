@@ -14,13 +14,17 @@ export const encrypt = async (event, context) => {
   });
   writeStream.end();
 
-  const readStream = fs.createReadStream(`/temp/${result.file.filename}`);
-  const encrypt = crypto.createCipher(algorithm, password);
-  const encryptWriteStream = fs.createWriteStream(
-    `/temp/${result.file.filename}.encrypt`
+  const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
+  encrypt = crypto.createCipher(algorithm, password);
+  encryptWriteStream = fs.createWriteStream(
+    `/tmp/${result.file.filename}.encrypt`
   );
 
   readStream.pipe(encrypt).pipe(encryptWriteStream);
+
+  encryptWriteStream.on("finish", () => {
+    console.log("encryption complete");
+  });
 
   return {
     statusCode: 200,
