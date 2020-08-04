@@ -12,7 +12,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   stage: dev
   region: us-east-1
   # To load environment variables externally
@@ -24,7 +24,13 @@ provider:
   #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
 
 functions:
-  hello:
+  decrypt:
+    handler: handler.decrypt
+    events:
+      - http:
+          path: decrypt
+          method: post
+  encrypt:
     handler: handler.encrypt
     events:
       - http:

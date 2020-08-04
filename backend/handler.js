@@ -2,6 +2,8 @@ import fs from "fs";
 import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 
+export const decrypt = async (event, context) => {};
+
 export const encrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
