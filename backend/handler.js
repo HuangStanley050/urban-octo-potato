@@ -4,11 +4,25 @@ import { parse } from "aws-lambda-multipart-parser";
 
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
+  const algorithm = "aes-256-ctr";
+  const password = "d6F3Efeq";
   const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
   writeStream.write(result.file.content);
   writeStream.on("finish", () => {
     console.log("finish upload");
   });
+  const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
+  const decrypt = crypto.createDecipher(algorithm, password);
+  const decryptWriteStream = fs.createWriteStream(
+    `/tmp/${result.file.filename}.decrypt`
+  );
+
+  readStream.pipe(decrypt).pipe(decryptWriteStream);
+
+  decryptWriteStream.on("finish", () => {
+    console.log("decryption complete");
+  });
+
   return {
     statusCode: 200,
     body: JSON.stringify({
