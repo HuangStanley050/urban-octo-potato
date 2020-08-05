@@ -2,7 +2,23 @@ import fs from "fs";
 import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 
-export const decrypt = async (event, context) => {};
+export const decrypt = async (event, context) => {
+  const result = parse(event, true);
+  const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
+  writeStream.write(result.file.content);
+  writeStream.on("finish", () => {
+    console.log("finish upload");
+  });
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `Go Serverless v1.0! ${await message({
+        time: 1,
+        copy: "decrypt complete",
+      })}`,
+    }),
+  };
+};
 
 export const encrypt = async (event, context) => {
   const result = parse(event, true);
@@ -33,7 +49,7 @@ export const encrypt = async (event, context) => {
     body: JSON.stringify({
       message: `Go Serverless v1.0! ${await message({
         time: 1,
-        copy: "Your function executed successfully!",
+        copy: "encrypt complete",
       })}`,
     }),
   };
