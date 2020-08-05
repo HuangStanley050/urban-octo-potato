@@ -1,6 +1,7 @@
 import fs from "fs";
 import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
+import AWS from "aws-sdk";
 
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
@@ -35,6 +36,10 @@ export const decrypt = async (event, context) => {
 };
 
 export const encrypt = async (event, context) => {
+  const s3 = new AWS.S3({
+    accessKeyId: "id",
+    secretAccessKey: "secret",
+  });
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
   const password = "d6F3Efeq";
@@ -55,6 +60,17 @@ export const encrypt = async (event, context) => {
   readStream.pipe(encrypt).pipe(encryptWriteStream);
 
   encryptWriteStream.on("finish", () => {
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: "cat.jpg", // File name you want to save as in S3
+      Body: fileContent,
+    };
+    s3.upload(params, function (err, data) {
+      if (err) {
+        throw err;
+      }
+      console.log(`File uploaded successfully. ${data.Location}`);
+    });
     console.log("encryption complete");
   });
 
