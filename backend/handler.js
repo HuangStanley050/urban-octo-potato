@@ -44,13 +44,23 @@ export const encrypt = async (event, context) => {
   const algorithm = "aes-256-ctr";
   const password = "d6F3Efeq";
   //console.log(result);
+
+  /*
+    Read the file from the client and save to /tmp
+   */
   const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
   writeStream.write(result.file.content);
   writeStream.on("finish", () => {
     console.log("upload finish");
   });
   writeStream.end();
+  /*
+    End upload file
+   */
 
+  /*
+    Read the file from /tmp and then encrypt it and save it back to /tmp
+   */
   const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   const encrypt = crypto.createCipher(algorithm, password);
   const encryptWriteStream = fs.createWriteStream(
@@ -58,7 +68,13 @@ export const encrypt = async (event, context) => {
   );
 
   readStream.pipe(encrypt).pipe(encryptWriteStream);
+  /*
+  end encrypting file and saving back to /tmp as new file
+   */
 
+  /*
+    when the encrypted file finished stream to /tmp, save the encrypted file to s3
+   */
   encryptWriteStream.on("finish", () => {
     const params = {
       Bucket: BUCKET_NAME,
@@ -73,6 +89,9 @@ export const encrypt = async (event, context) => {
     });
     console.log("encryption complete");
   });
+  /*
+   end saving file to s3
+   */
 
   return {
     statusCode: 200,
