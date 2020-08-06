@@ -20,8 +20,10 @@ provider:
   # the following line. Also, make sure to not
   # commit your .env.
   #
-  #environment:
-  #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+  environment:
+    SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+    AWS_ID: ${env:AWS_ID}
+    AWS_KEY: ${env:AWS_KEY}
 
 functions:
   decrypt:
