@@ -12,6 +12,8 @@ const saveToFileSystem = (filePath) => {
   });
 };
 
+const encryptAndSaveToFileSystem = (filePath, encrypt) => {};
+
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
