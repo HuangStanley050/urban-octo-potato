@@ -24,6 +24,7 @@ provider:
     AWS_ID: ${env:AWS_ID}
     AWS_KEY: ${env:AWS_KEY}
     BUCKET_NAME: ${env:BUCKET_NAME}
+    PASSWD: ${env:PASSWD}
 
 functions:
   decrypt:

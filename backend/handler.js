@@ -3,6 +3,15 @@ import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 import AWS from "aws-sdk";
 
+const saveToFileSystem = (filePath) => {
+  return new Promise((resolve, reject) => {
+    const fileWriteStream = fs.createWriteStream(filePath);
+    fileWriteStream
+      .on("finish", resolve("upload finish"))
+      .on("error", reject("unable to upload"));
+  });
+};
+
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
@@ -49,12 +58,11 @@ export const encrypt = async (event, context) => {
   /*
     Read the file from the client and save to /tmp
    */
-  const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
-  writeStream.write(result.file.content);
-  writeStream.on("finish", () => {
-    console.log("upload finish");
-  });
-  writeStream.end();
+
+  let uploadResult = await saveToFileSystem(`/tmp/${result.file.filename}`);
+  console.log("this is the result of saving uploaded file to file system");
+  console.log(uploadResult);
+
   /*
     End upload file
    */
@@ -92,7 +100,6 @@ export const encrypt = async (event, context) => {
         }
       });
     });
-    location = res.Location;
     console.log(res.Location);
     console.log("encryption complete");
   });
