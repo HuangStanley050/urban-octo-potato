@@ -21,7 +21,6 @@ provider:
   # commit your .env.
   #
   environment:
-    SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
     AWS_ID: ${env:AWS_ID}
     AWS_KEY: ${env:AWS_KEY}
     BUCKET_NAME: ${env:BUCKET_NAME}

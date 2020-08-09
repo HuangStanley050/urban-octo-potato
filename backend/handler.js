@@ -43,6 +43,7 @@ export const encrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
   const password = "d6F3Efeq";
+  let location = "";
   //console.log(result);
 
   /*
@@ -80,13 +81,19 @@ export const encrypt = async (event, context) => {
       Bucket: process.env.BUCKET_NAME,
       Key: `${result.file.filename}.encrypt`, // File name you want to save as in S3
       Body: fs.createReadStream(`/tmp/${result.file.filename}.encrypt`),
+      //ACL: "public-read",
     };
     const res = await new Promise((resolve, reject) => {
-      s3.upload(params, (err, data) =>
-        err == null ? resolve(data) : reject(err)
-      );
+      s3.upload(params, (err, data) => {
+        if (err === null) {
+          resolve(data);
+        } else {
+          reject(err);
+        }
+      });
     });
-    console.log(res);
+    location = res.Location;
+    console.log(res.Location);
     console.log("encryption complete");
   });
   /*
@@ -96,10 +103,7 @@ export const encrypt = async (event, context) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: `Go Serverless v1.0! ${await message({
-        time: 1,
-        copy: "encrypt complete",
-      })}`,
+      message: `Go Serverless v1.0! ${location}`,
     }),
   };
 };
