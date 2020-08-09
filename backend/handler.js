@@ -37,8 +37,8 @@ export const decrypt = async (event, context) => {
 
 export const encrypt = async (event, context) => {
   const s3 = new AWS.S3({
-    accessKeyId: "id",
-    secretAccessKey: "secret",
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_KEY,
   });
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
@@ -75,18 +75,18 @@ export const encrypt = async (event, context) => {
   /*
     when the encrypted file finished stream to /tmp, save the encrypted file to s3
    */
-  encryptWriteStream.on("finish", () => {
+  encryptWriteStream.on("finish", async () => {
     const params = {
-      Bucket: BUCKET_NAME,
-      Key: "cat.jpg", // File name you want to save as in S3
-      Body: fileContent,
+      Bucket: process.env.BUCKET_NAME,
+      Key: `${result.file.filename}.encrypt`, // File name you want to save as in S3
+      Body: fs.createReadStream(`/tmp/${result.file.filename}.encrypt`),
     };
-    s3.upload(params, function (err, data) {
-      if (err) {
-        throw err;
-      }
-      console.log(`File uploaded successfully. ${data.Location}`);
+    const res = await new Promise((resolve, reject) => {
+      s3.upload(params, (err, data) =>
+        err == null ? resolve(data) : reject(err)
+      );
     });
+    console.log(res);
     console.log("encryption complete");
   });
   /*
