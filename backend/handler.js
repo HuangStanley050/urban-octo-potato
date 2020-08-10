@@ -81,13 +81,14 @@ export const encrypt = async (event, context) => {
   /*
     Read the file from /tmp and then encrypt it and save it back to /tmp
    */
-  const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
+  //const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   const encrypt = crypto.createCipher(algorithm, password);
-  const encryptWriteStream = fs.createWriteStream(
-    `/tmp/${result.file.filename}.encrypt`
-  );
+  await encryptAndSaveToFileSystem(`/tmp/${result.file.filename}`, encrypt);
+  //const encryptWriteStream = fs.createWriteStream(
+  //  `/tmp/${result.file.filename}.encrypt`
+  //);
 
-  readStream.pipe(encrypt).pipe(encryptWriteStream);
+  //readStream.pipe(encrypt).pipe(encryptWriteStream);
   /*
   end encrypting file and saving back to /tmp as new file
    */
@@ -95,25 +96,25 @@ export const encrypt = async (event, context) => {
   /*
     when the encrypted file finished stream to /tmp, save the encrypted file to s3
    */
-  encryptWriteStream.on("finish", async () => {
-    const params = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: `${result.file.filename}.encrypt`, // File name you want to save as in S3
-      Body: fs.createReadStream(`/tmp/${result.file.filename}.encrypt`),
-      //ACL: "public-read",
-    };
-    const res = await new Promise((resolve, reject) => {
-      s3.upload(params, (err, data) => {
-        if (err === null) {
-          resolve(data);
-        } else {
-          reject(err);
-        }
-      });
-    });
-    console.log(res.Location);
-    console.log("encryption complete");
-  });
+  // encryptWriteStream.on("finish", async () => {
+  //   const params = {
+  //     Bucket: process.env.BUCKET_NAME,
+  //     Key: `${result.file.filename}.encrypt`, // File name you want to save as in S3
+  //     Body: fs.createReadStream(`/tmp/${result.file.filename}.encrypt`),
+  //     //ACL: "public-read",
+  //   };
+  //   const res = await new Promise((resolve, reject) => {
+  //     s3.upload(params, (err, data) => {
+  //       if (err === null) {
+  //         resolve(data);
+  //       } else {
+  //         reject(err);
+  //       }
+  //     });
+  //   });
+  //   console.log(res.Location);
+  //   console.log("encryption complete");
+  // });
   /*
    end saving file to s3
    */
