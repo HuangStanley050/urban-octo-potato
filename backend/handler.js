@@ -12,7 +12,16 @@ const saveToFileSystem = (filePath) => {
   });
 };
 
-const encryptAndSaveToFileSystem = (filePath, encrypt) => {};
+const encryptAndSaveToFileSystem = (filePath, encrypt) => {
+  return new Promise((resolve, reject) => {
+    const readStream = fs.createReadStream(filePath);
+    const writeStream = fs.createWriteStream(`${filePath}.encrypt`);
+    readStream.pipe(encrypt).pipe(writeStream);
+    readStream
+      .on("finish", resolve("file encrypted and saved"))
+      .on("error", reject("unable to encrypt and save file"));
+  });
+};
 
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
