@@ -41,10 +41,19 @@ export const encrypt = async (event, context) => {
     accessKeyId: process.env.AWS_ID,
     secretAccessKey: process.env.AWS_KEY,
   });
+
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${result.file.filename}.encrypt`,
+    Body: fs.createReadStream(`/tmp/${result.file.filename}.encrypt`),
+  };
+
   const result = parse(event, true);
+
   const algorithm = "aes-256-ctr";
+
   const password = process.env.PASSWD;
-  let location = "";
+
   //console.log(result);
 
   /*
@@ -65,6 +74,16 @@ export const encrypt = async (event, context) => {
   //const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   const encrypt = crypto.createCipher(algorithm, password);
   await encryptAndSaveToFileSystem(`/tmp/${result.file.filename}`, encrypt);
+
+  await new Promise((resolve, reject) => {
+    s3.upload(params, (err, data) => {
+      if (err === null) {
+        resolve("upload to s3 successful");
+      } else {
+        reject(err);
+      }
+    });
+  });
   //const encryptWriteStream = fs.createWriteStream(
   //  `/tmp/${result.file.filename}.encrypt`
   //);
