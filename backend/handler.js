@@ -2,7 +2,11 @@ import fs from "fs";
 import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 import AWS from "aws-sdk";
-import { saveToFileSystem, transformAndSaveToFileSystem } from "./util";
+import {
+  uploadS3,
+  saveToFileSystem,
+  transformAndSaveToFileSystem,
+} from "./util";
 
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
@@ -84,16 +88,16 @@ export const encrypt = async (event, context) => {
     encrypt,
     "encrypt"
   );
-
-  await new Promise((resolve, reject) => {
-    s3.upload(params, (err, data) => {
-      if (err === null) {
-        resolve("upload to s3 successful");
-      } else {
-        reject(err);
-      }
-    });
-  });
+  await uploadS3(s3, params);
+  // await new Promise((resolve, reject) => {
+  //   s3.upload(params, (err, data) => {
+  //     if (err === null) {
+  //       resolve("upload to s3 successful");
+  //     } else {
+  //       reject(err);
+  //     }
+  //   });
+  // });
   //const encryptWriteStream = fs.createWriteStream(
   //  `/tmp/${result.file.filename}.encrypt`
   //);

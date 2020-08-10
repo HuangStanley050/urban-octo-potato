@@ -22,3 +22,15 @@ export const transformAndSaveToFileSystem = (filePath, method, type) => {
       .on("error", reject("unable to encrypt and save file"));
   });
 };
+
+export const uploadS3 = (s3Instance, params) => {
+  return new Promose((resolve, reject) => {
+    s3.upload(params, (err, data) => {
+      if (err === null) {
+        resolve("upload to s3 successful");
+      } else {
+        reject(err);
+      }
+    });
+  });
+};
