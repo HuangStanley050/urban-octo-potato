@@ -94,7 +94,7 @@ export const encrypt = async (event, context) => {
    */
   //const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   const encrypt = crypto.createCipher(algorithm, password);
-  await encryptAndSaveToFileSystem(
+  await transformAndSaveToFileSystem(
     `/tmp/${result.file.filename}`,
     encrypt,
     "encrypt"
