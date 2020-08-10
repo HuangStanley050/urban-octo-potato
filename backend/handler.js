@@ -9,6 +9,16 @@ import {
 } from "./util";
 
 export const decrypt = async (event, context) => {
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_KEY,
+  });
+
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${result.file.filename}.encrypt`,
+    Body: fs.createReadStream(`/tmp/${result.file.filename}.decrypt`),
+  };
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
   const password = process.env.PASSWD;
@@ -24,6 +34,7 @@ export const decrypt = async (event, context) => {
     decrypt,
     "decrypt"
   );
+  await uploadS3(s3, params);
   // const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   // const decryptWriteStream = fs.createWriteStream(
   //   `/tmp/${result.file.filename}.decrypt`
