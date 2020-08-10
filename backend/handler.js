@@ -26,7 +26,7 @@ const encryptAndSaveToFileSystem = (filePath, encrypt) => {
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
-  const password = "d6F3Efeq";
+  const password = process.env.PASSWD;
   const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
   writeStream.write(result.file.content);
   writeStream.on("finish", () => {
@@ -62,7 +62,7 @@ export const encrypt = async (event, context) => {
   });
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
-  const password = "d6F3Efeq";
+  const password = process.env.PASSWD;
   let location = "";
   //console.log(result);
 
