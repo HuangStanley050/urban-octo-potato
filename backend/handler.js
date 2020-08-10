@@ -2,28 +2,34 @@ import fs from "fs";
 import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 import AWS from "aws-sdk";
-import { saveToFileSystem, encryptAndSaveToFileSystem } from "./util";
+import { saveToFileSystem, transformAndSaveToFileSystem } from "./util";
 
 export const decrypt = async (event, context) => {
   const result = parse(event, true);
   const algorithm = "aes-256-ctr";
   const password = process.env.PASSWD;
-  const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
-  writeStream.write(result.file.content);
-  writeStream.on("finish", () => {
-    console.log("finish upload");
-  });
-  const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
+  // const writeStream = fs.createWriteStream(`/tmp/${result.file.filename}`);
+  // writeStream.write(result.file.content);
+  // writeStream.on("finish", () => {
+  //   console.log("finish upload");
+  // });
+  await saveToFileSystem(`/tmp/${result.file.filename}`);
   const decrypt = crypto.createDecipher(algorithm, password);
-  const decryptWriteStream = fs.createWriteStream(
-    `/tmp/${result.file.filename}.decrypt`
+  await transformAndSaveToFileSystem(
+    `/tmp/${result.file.filename}`,
+    decrypt,
+    "decrypt"
   );
-
-  readStream.pipe(decrypt).pipe(decryptWriteStream);
-
-  decryptWriteStream.on("finish", () => {
-    console.log("decryption complete");
-  });
+  // const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
+  // const decryptWriteStream = fs.createWriteStream(
+  //   `/tmp/${result.file.filename}.decrypt`
+  // );
+  //
+  // readStream.pipe(decrypt).pipe(decryptWriteStream);
+  //
+  // decryptWriteStream.on("finish", () => {
+  //   console.log("decryption complete");
+  // });
 
   return {
     statusCode: 200,
@@ -73,7 +79,11 @@ export const encrypt = async (event, context) => {
    */
   //const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   const encrypt = crypto.createCipher(algorithm, password);
-  await encryptAndSaveToFileSystem(`/tmp/${result.file.filename}`, encrypt);
+  await encryptAndSaveToFileSystem(
+    `/tmp/${result.file.filename}`,
+    encrypt,
+    "encrypt"
+  );
 
   await new Promise((resolve, reject) => {
     s3.upload(params, (err, data) => {

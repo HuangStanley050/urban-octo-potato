@@ -7,10 +7,15 @@ export const saveToFileSystem = (filePath) => {
   });
 };
 
-export const encryptAndSaveToFileSystem = (filePath, encrypt) => {
+export const transformAndSaveToFileSystem = (filePath, method, type) => {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(filePath);
-    const writeStream = fs.createWriteStream(`${filePath}.encrypt`);
+    let writeStream;
+    if (type === "encrypt") {
+      writeStream = fs.createWriteStream(`${filePath}.encrypt`);
+    } else {
+      writeStream = fs.createWriteStream(`${filePath}.decrypt`);
+    }
     readStream.pipe(encrypt).pipe(writeStream);
     readStream
       .on("finish", resolve("file encrypted and saved"))
