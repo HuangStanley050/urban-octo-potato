@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { parse } from "aws-lambda-multipart-parser";
 import AWS from "aws-sdk";
 import {
+  getDownloadUrl,
   uploadS3,
   saveToFileSystem,
   transformAndSaveToFileSystem,
@@ -100,6 +101,15 @@ export const encrypt = async (event, context) => {
     "encrypt"
   );
   await uploadS3(s3, params);
+
+  let downloadParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${result.file.filename}.encrypt`,
+    Expires: 300,
+    //link expires in 5 mins
+  };
+  let result = await getDownloadUrl(s3, downloadParams);
+  console.log(result);
   // await new Promise((resolve, reject) => {
   //   s3.upload(params, (err, data) => {
   //     if (err === null) {

@@ -23,6 +23,16 @@ export const transformAndSaveToFileSystem = (filePath, method, type) => {
   });
 };
 
+/*
+var params = {Bucket: 'bucket', Key: 'key', Expires: 60};
+var promise = s3.getSignedUrlPromise('getObject', params);
+promise.then(function(url) {
+  console.log('The URL is', url);
+}, function(err) { ... });
+ */
+export const getDownloadUrl = (s3, params) => {
+  return s3.getSignedUrlPromise("getObject", params);
+};
 export const uploadS3 = (s3Instance, params) => {
   return new Promose((resolve, reject) => {
     s3.upload(params, (err, data) => {
