@@ -36,6 +36,15 @@ export const decrypt = async (event, context) => {
     "decrypt"
   );
   await uploadS3(s3, params);
+
+  let downloadParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${result.file.filename}.decrypt`,
+    Expires: 300,
+    //link expires in 5 mins
+  };
+  let downloadResult = await getDownloadUrl(s3, downloadParams);
+  console.log(downloadResult);
   // const readStream = fs.createReadStream(`/tmp/${result.file.filename}`);
   // const decryptWriteStream = fs.createWriteStream(
   //   `/tmp/${result.file.filename}.decrypt`
@@ -108,8 +117,8 @@ export const encrypt = async (event, context) => {
     Expires: 300,
     //link expires in 5 mins
   };
-  let result = await getDownloadUrl(s3, downloadParams);
-  console.log(result);
+  let downloadResult = await getDownloadUrl(s3, downloadParams);
+  console.log(downloadResult);
   // await new Promise((resolve, reject) => {
   //   s3.upload(params, (err, data) => {
   //     if (err === null) {
