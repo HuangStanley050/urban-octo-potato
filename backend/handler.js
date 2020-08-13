@@ -17,7 +17,7 @@ export const decrypt = async (event, context) => {
 
   const params = {
     Bucket: process.env.BUCKET_NAME,
-    Key: `${result.file.filename}.encrypt`,
+    Key: `${result.file.filename}.decrypt`,
     Body: fs.createReadStream(`/tmp/${result.file.filename}.decrypt`),
   };
   const result = parse(event, true);
