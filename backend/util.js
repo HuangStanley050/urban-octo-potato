@@ -33,7 +33,7 @@ promise.then(function(url) {
 export const getDownloadUrl = (s3, params) => {
   return s3.getSignedUrlPromise("getObject", params);
 };
-export const uploadS3 = (s3Instance, params) => {
+export const uploadS3 = (s3, params) => {
   return new Promose((resolve, reject) => {
     s3.upload(params, (err, data) => {
       if (err === null) {
